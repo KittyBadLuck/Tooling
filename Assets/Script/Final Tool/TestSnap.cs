@@ -44,7 +44,9 @@ public class SnapEditorTest : Editor
         
         targetClosestPoint = targetCollider.ClosestPoint(snapE.transform.position);
         offset = snapE.transform.position - targetClosestPoint;
-        offset = snapE.transform.InverseTransformDirection(offset);
+        Vector3 normalOfSphere = Vector3.Normalize(offset);
+        Quaternion normalOfSphereQuat = Quaternion.Euler(normalOfSphere);
+        //offset = snapE.transform.InverseTransformDirection(offset);
         if (snapE.useClampOffset)
         { 
             offset = new Vector3(Mathf.Clamp(offset.x, 0, 0), Mathf.Clamp(offset.y, snapE.ClampOffset, snapE.ClampOffset), Mathf.Clamp(offset.z,0,0));
@@ -64,14 +66,15 @@ public class SnapEditorTest : Editor
 
         if (snapE.useCustomHandle)
         {
-            Quaternion quaternion = Quaternion.FromToRotation(Vector3.up, snapE.transform.position);
+            //Quaternion quaternion = Quaternion.FromToRotation(Vector3.up, snapE.transform.position);
+            Quaternion quaternion = Quaternion.identity;
             position = Handles.PositionHandle(targetClosestPoint, quaternion) ;
             rotation = Handles.RotationHandle(quaternion,targetClosestPoint);
             
             if (  snapE.useSnap == true)
             {
                 snapE.transform.rotation = rotation;
-               snapE.transform.position = position + (rotation * offset);
+               snapE.transform.position = position + (normalOfSphereQuat * offset);
             }
         }
         
